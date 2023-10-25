@@ -32,6 +32,7 @@ export default Gameboard = ({navigation, route}) => {
     // Tulostaulun pisteet
     const [scores, setScores] = useState([]);
     const [totalPoints, setTotalPoints] = useState(0);
+    const [bonusPointsStatus, setBonusPointsStatus] = useState('');
 
     const date = new Date().getDate();
     const month = new Date().getMonth() + 1;
@@ -201,6 +202,8 @@ export default Gameboard = ({navigation, route}) => {
         }
         setTotalPoints(sum);
 
+        
+
         setNbrOfThrowsLeft(nbrOfThrowsLeft-1);
         setDiceSpots(spots);
         setStatus('Select and throw dices again');
@@ -227,6 +230,19 @@ export default Gameboard = ({navigation, route}) => {
         diceSpots.fill(0);
     }
 
+    // Adding bonus points
+
+    const checkBonusPoints = () => {
+        let runOnlyOnce = false;
+
+        if (totalPoints >= 63 && !runOnlyOnce) {
+            let bonus = 50;
+            let bonusAdded = totalPoints + bonus;
+            setTotalPoints(bonusAdded);
+            runOnlyOnce=true;
+            setBonusPointsStatus('Bonus points (50p) added!');
+        }  
+    }
     
 
     function getSpotTotal(i) {
@@ -280,6 +296,7 @@ export default Gameboard = ({navigation, route}) => {
                     <Text>SAVE POINTS</Text>
                     <Text>Points total: {totalPoints}</Text>
                 </Pressable>
+                <Text>{bonusPointsStatus}</Text>
                 <Text>Player: {playerName}</Text>
             </View>
             <Footer />
