@@ -10,7 +10,8 @@ import Scoreboard from '../components/Scoreboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let board = [];
-let diceValues = [];
+// let diceValues = [];
+let addBonus = false;
 
 export default Gameboard = ({navigation, route}) => {
 
@@ -28,11 +29,13 @@ export default Gameboard = ({navigation, route}) => {
     const [dicePointsTotal, setDicePointsTotal] = useState(new Array(MAX_SPOT).fill(0));
     //const [isDisabled, setIsDisabled] = useState(false);
     let dices = [...selectedDices];
-    const [pointsAwayFromBonus, setPointsAwayFromBonus] = useState(63);
+    const [pointsLeftToBonus, setPointsLeftToBonus] = useState(BONUS_POINTS_LIMIT);
     // Tulostaulun pisteet
     const [scores, setScores] = useState([]);
     const [totalPoints, setTotalPoints] = useState(0);
     const [bonusPointsStatus, setBonusPointsStatus] = useState('');
+    const [throwDices18times, setThrowDices18times] = useState(0);
+    const [thrown18times, setThrown18times] = useState(false);
 
     const date = new Date().getDate();
     const month = new Date().getMonth() + 1;
@@ -168,6 +171,7 @@ export default Gameboard = ({navigation, route}) => {
     const throwDices = () => {
         if (nbrOfThrowsLeft === 0 && !gameEndStatus) {
             setStatus('Select your points before the next throw');
+            // checkBonusPoints();
             return 1;
         }
         else if (nbrOfThrowsLeft === 0 && gameEndStatus) {
@@ -178,10 +182,11 @@ export default Gameboard = ({navigation, route}) => {
 
         /* Starting the game again after points are selected for every number. */
 
-        else if (selectedDicePoints.every((val) => val === true)) {
+        /* else if (selectedDicePoints.every((val) => val === true)) {
             gameOverAlert();
             newGame();
-        }
+            // savePlayerPoints();
+        } */
 
         let spots = [...diceSpots];
 
@@ -195,14 +200,12 @@ export default Gameboard = ({navigation, route}) => {
 
          // Addition for total points
 
-        let sum = 0;
+        /*let sum = 0;
 
         for (let i of dicePointsTotal) {
             sum = sum+ i;
         }
-        setTotalPoints(sum);
-
-        
+        setTotalPoints(sum);*/
 
         setNbrOfThrowsLeft(nbrOfThrowsLeft-1);
         setDiceSpots(spots);
@@ -212,12 +215,14 @@ export default Gameboard = ({navigation, route}) => {
     // Alerting the player about the game ending.
 
     const gameOverAlert = () =>
-    Alert.alert('Game over!', 'The game came to the end. Continue new game by selecting dices or go to scorebaord.', [
-      {
-        text: 'Go to scoreboard',
-        onPress: () => navigation.navigate('Scoreboard'),
-      },
-      {text: 'Continue the new game'},
+    Alert.alert('Game over! You got ' + totalPoints + ' points.', 'Start a new game by throwing dices!', [
+        {
+            text: 'Go to scoreboard',
+            onPress: () => navigation.navigate('Scoreboard'),
+        },
+        {
+            text: 'Play again',
+        },
     ]);
 
     // Function for the new game.
@@ -225,23 +230,23 @@ export default Gameboard = ({navigation, route}) => {
     const newGame = () => {
         board = [];
         setDicePointsTotal(new Array(MAX_SPOT).fill(0));
+        setTotalPoints(0);
         setSelectedDicePoints(new Array(MAX_SPOT).fill(false));
         setNbrOfThrowsLeft(NBR_OF_THROWS);
         diceSpots.fill(0);
+        setPointsLeftToBonus(BONUS_POINTS_LIMIT);
+        addBonus = false;
     }
 
     // Adding bonus points
 
     const checkBonusPoints = () => {
-        let runOnlyOnce = false;
 
-        if (totalPoints >= 63 && !runOnlyOnce) {
-            let bonus = 50;
-            let bonusAdded = totalPoints + bonus;
-            setTotalPoints(bonusAdded);
-            runOnlyOnce=true;
-            setBonusPointsStatus('Bonus points (50p) added!');
-        }  
+        if (pointsLeftToBonus <= 0 && addBonus === false) {
+            addBonus = true;
+            setTotalPoints(totalPoints + pointsLeftToBonus);
+            setBonusPointsStatus('You got bonus points (+50p)!');
+        }
     }
     
 
@@ -270,6 +275,72 @@ export default Gameboard = ({navigation, route}) => {
         return unsubscribe;
     }, [navigation]);
 
+    // Addition for total points (this doesn't work correctly yet)
+
+    useEffect(() => {
+
+        let sum = 0;
+
+        for (let i of dicePointsTotal) {
+            sum = sum + i;
+        }
+
+        setTotalPoints(sum);
+    })
+
+    /* Starting the game again after points are selected for every number and saving points. */
+
+   useEffect(() => {
+        if (selectedDicePoints.every((val) => val === true)) {
+            setThrown18times(true);
+        }
+
+        if (thrown18times === true) {
+            savePlayerPoints();
+            gameOverAlert();
+            newGame();
+            setThrowDices18times(0);
+            setDiceSpots(new Array(NBR_OF_DICES).fill(0));
+            setThrown18times(false);
+            setSelectedDices(new Array(NBR_OF_DICES).fill(false));
+        }
+    })
+
+    /* const functionsTogether = () => {
+
+        if (throwDices18times <= 17) {
+            setThrown18times(false);
+            setThrowDices18times(throwDices18times + 1);
+            throwDices();
+            console.log(throwDices18times);
+        }
+        else {
+            setThrown18times(true);
+        }
+        else if (pointsRow === MAX_SPOT) {
+            savePlayerPoints();
+            gameOverAlert();
+            newGame();
+            setThrowDices18times(0);
+            diceSpots.fill(0);
+        }
+    }
+
+    useEffect(() => {
+
+        if (thrown18times === true) {
+            savePlayerPoints();
+            gameOverAlert();
+            newGame();
+            setThrowDices18times(0);
+            setDiceSpots(new Array(NBR_OF_DICES).fill(0));
+            setThrown18times(false);
+            setSelectedDices(new Array(NBR_OF_DICES).fill(false));
+        }
+    }) */
+
+    // onPress={() => savePlayerPoints()}
+
     return (
         <>
             <Header />
@@ -291,11 +362,7 @@ export default Gameboard = ({navigation, route}) => {
                 <Container fluid>
                     <Row>{pointsToSelectRow}</Row>
                 </Container>
-                <Pressable
-                    onPress={() => savePlayerPoints()}>
-                    <Text>SAVE POINTS</Text>
-                    <Text>Points total: {totalPoints}</Text>
-                </Pressable>
+                <Text>Points total: {totalPoints}</Text>
                 <Text>{bonusPointsStatus}</Text>
                 <Text>Player: {playerName}</Text>
             </View>
