@@ -6,12 +6,12 @@ import { NBR_OF_DICES, NBR_OF_THROWS, MIN_SPOT, MAX_SPOT, BONUS_POINTS_LIMIT, BO
 import styles from '../style/style';
 import { Container, Row, Col } from 'react-native-flex-grid';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import Scoreboard from '../components/Scoreboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let board = [];
-// let diceValues = [];
-let addBonus = true;
+let addBonus = true
 
 export default Gameboard = ({navigation, route}) => {
 
@@ -64,7 +64,7 @@ export default Gameboard = ({navigation, route}) => {
     for (let spot = 0; spot < MAX_SPOT; spot++) {
         pointsRow.push(
             <Col key={"pointsRow" + spot}>
-                    <Text key={"pointsRow" + spot}>
+                    <Text style={styles.points} key={"pointsRow" + spot}>
                         {getSpotTotal(spot)}
                     </Text>
             </Col>
@@ -128,7 +128,7 @@ export default Gameboard = ({navigation, route}) => {
         }
     }
 
-    // Unselecting the dices during the game.
+    // Unselecting dices during the game.
 
     const undoDiceSelection = () => {
         dices.fill(false);
@@ -179,14 +179,6 @@ export default Gameboard = ({navigation, route}) => {
             dicePointsTotal.fill(0);
         }
 
-        /* Starting the game again after points are selected for every number. */
-
-        /* else if (selectedDicePoints.every((val) => val === true)) {
-            gameOverAlert();
-            newGame();
-            // savePlayerPoints();
-        } */
-
         let spots = [...diceSpots];
 
         for (let i = 0; i < NBR_OF_DICES; i++) {
@@ -197,16 +189,6 @@ export default Gameboard = ({navigation, route}) => {
             }
         }
 
-         // Addition for total points
-
-        /*let sum = 0;
-
-        for (let i of dicePointsTotal) {
-            sum = sum+ i;
-        }
-        setTotalPoints(sum);*/
-
-        // checkBonusPoints();
         setNbrOfThrowsLeft(nbrOfThrowsLeft-1);
         setDiceSpots(spots);
         setStatus('Select and throw dices again');
@@ -274,58 +256,20 @@ export default Gameboard = ({navigation, route}) => {
             sum = sum + i;
 
             if (sum >= 63 && addBonus == true) {
-                sum = sum + 50;
+                bonussum = sum + 50;
                 setBonusPointsStatus('You got bonus points (+50p)!');
                 addBonus = false;
+                sum = bonussum;
+            }
+            else if (addBonus == false) {
+                setBonusPointsStatus('You got bonus points (+50p)!');
+                bonussum;
+                sum = bonussum;
             }
         }
 
         setTotalPoints(sum);
-        //checkBonusPoints();
     })
-
-    // Adding bonus points
-
-    /* useEffect(() => {
-
-        /*addBonus = false;
-
-        if (totalPoints >= 63) {
-            addBonus = true;
-            let bonusPointsAdded = totalPoints + 50;
-            setTotalPoints(bonusPointsAdded);
-            setBonusPointsStatus('You got bonus points (+50p)!');
-        } else if (totalPoints >= 113) {
-            addBonus = false;
-        }
-
-        console.log(totalPoints);
-        return;
-
-        if (totalPoints >= 63) {
-            let bonus = 50;
-            let total = totalPoints;
-            setTotalPoints(total + bonus);
-            console.log(totalPoints);
-        }
-
-    }) */
-
-    /*let bonus = 0;
-
-   const checkBonusPoints = () => {
-
-        if (BONUS_POINTS_LIMIT <= totalPoints && addBonus == true) {
-            bonus = totalPoints + 50;
-            setBonusPointsStatus('You got bonus points (+50p)!');
-            addBonus = false;
-            console.log(bonus);
-        }else if (addBonus === true) {
-            addBonus = false;
-        }
-
-        //console.log(bonus);
-    } */
 
     /* Starting the game again after points are selected for every number and saving player points. */
 
@@ -345,55 +289,20 @@ export default Gameboard = ({navigation, route}) => {
         }
     })
 
-    /* const functionsTogether = () => {
-
-        if (throwDices18times <= 17) {
-            setThrown18times(false);
-            setThrowDices18times(throwDices18times + 1);
-            throwDices();
-            console.log(throwDices18times);
-        }
-        else {
-            setThrown18times(true);
-        }
-        else if (pointsRow === MAX_SPOT) {
-            savePlayerPoints();
-            gameOverAlert();
-            newGame();
-            setThrowDices18times(0);
-            diceSpots.fill(0);
-        }
-    }
-
-    useEffect(() => {
-
-        if (thrown18times === true) {
-            savePlayerPoints();
-            gameOverAlert();
-            newGame();
-            setThrowDices18times(0);
-            setDiceSpots(new Array(NBR_OF_DICES).fill(0));
-            setThrown18times(false);
-            setSelectedDices(new Array(NBR_OF_DICES).fill(false));
-        }
-    }) */
-
-    // onPress={() => savePlayerPoints()}
-
     return (
         <>
             <Header />
-            <View>
-                <Text>Gameboard here...</Text>
+            <View style={styles.home}>
                 <Container fluid>
                     <Row>{dicesRow}</Row>
                 </Container>
-                <Text>Throws left: {nbrOfThrowsLeft}</Text>
-                <Text>{status}</Text>
-                <Pressable
+                <Text style={styles.gameboardText}>Throws left: {nbrOfThrowsLeft}</Text>
+                <Text style={styles.gameStatus}>{status}</Text>
+                <Pressable style={styles.throwButton}
                     onPress={() => throwDices()}
                     >
-                        <Text>THROW DICES</Text>
+                        <Text style={styles.buttonText}>THROW
+                        <MaterialCommunityIcons name="dice-multiple-outline" size={20} color="lightblue" /></Text>
                 </Pressable>
                 <Container fluid>
                     <Row>{pointsRow}</Row>
@@ -401,9 +310,10 @@ export default Gameboard = ({navigation, route}) => {
                 <Container fluid>
                     <Row>{pointsToSelectRow}</Row>
                 </Container>
-                <Text>Points total: {totalPoints}</Text>
-                <Text>{bonusPointsStatus}</Text>
-                <Text>Player: {playerName}</Text>
+                <Text style={styles.pointsText}>Points total: {totalPoints}</Text>
+                <Text style={styles.gameboardText}>{bonusPointsStatus}</Text>
+                <Text style={styles.playerText}>Player: {playerName}</Text>
+                <SimpleLineIcons name="game-controller" size={120} color="lightpink" />
             </View>
             <Footer />
         </>

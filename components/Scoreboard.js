@@ -6,6 +6,7 @@ import Footer from './Footer';
 import { NBR_OF_SCOREBOARD_ROWS, SCOREBOARD_KEY } from '../constants/Game';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import styles from '../style/style';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export default Scoreboard = ({ navigation }) => {
 
@@ -16,6 +17,7 @@ export default Scoreboard = ({ navigation }) => {
             const jsonValue = await AsyncStorage.getItem(SCOREBOARD_KEY);
             if (jsonValue !== null) {
                 let tmpScores = JSON.parse(jsonValue);
+                tmpScores.sort((a, b) => parseFloat(b.points) - parseFloat(a.points)); // Sorting scores
                 setScores(tmpScores);
             }
         }
@@ -45,27 +47,27 @@ export default Scoreboard = ({ navigation }) => {
     return (
         <>
             <Header />
-            <View>
-                <Text>Scoreboard here...</Text>
+            <View style={styles.home}>
+                <MaterialIcons name="sports-esports" size={100} color="lightpink"/>
                 { scores.length === 0 ?
                     <Text>Scoreboard is empty</Text>
                     :
                     scores.map((player, index) => (
                         index < NBR_OF_SCOREBOARD_ROWS &&
-                        <DataTable.Row key={player.key}>
-                            <DataTable.Cell><Text>{index + 1}</Text></DataTable.Cell>
-                            <DataTable.Cell><Text>{player.name}</Text></DataTable.Cell>
-                            <DataTable.Cell><Text>{player.date}</Text></DataTable.Cell>
-                            <DataTable.Cell><Text>{player.time}</Text></DataTable.Cell>
-                            <DataTable.Cell><Text>{player.points}</Text></DataTable.Cell>
+                        <DataTable.Row style={styles.dataTable} key={player.key}>
+                            <DataTable.Cell><Text style={styles.dataTableText}>{index + 1}</Text></DataTable.Cell>
+                            <DataTable.Cell><Text style={styles.dataTableText}>{player.name}</Text></DataTable.Cell>
+                            <DataTable.Cell><Text style={styles.dataTableText}>{player.date}</Text></DataTable.Cell>
+                            <DataTable.Cell><Text style={styles.dataTableText}>{player.time}</Text></DataTable.Cell>
+                            <DataTable.Cell><Text style={styles.dataTableText}>{player.points}</Text></DataTable.Cell>
                         </DataTable.Row>
                     ))   
                 }
             </View>
-            <View>
-                <Pressable
+            <View style={styles.home}>
+                <Pressable style={styles.clearButton}
                     onPress={() => clearScoreboard()}>
-                        <Text>Clear scoreboard</Text>
+                        <Text style={styles.clearText}>Clear scoreboard</Text>
                 </Pressable>
             </View>
             <Footer />
