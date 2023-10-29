@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let board = [];
 // let diceValues = [];
-let addBonus = false;
+let addBonus = true
 
 export default Gameboard = ({navigation, route}) => {
 
@@ -29,7 +29,6 @@ export default Gameboard = ({navigation, route}) => {
     const [dicePointsTotal, setDicePointsTotal] = useState(new Array(MAX_SPOT).fill(0));
     //const [isDisabled, setIsDisabled] = useState(false);
     let dices = [...selectedDices];
-    const [pointsLeftToBonus, setPointsLeftToBonus] = useState(BONUS_POINTS_LIMIT);
     // Tulostaulun pisteet
     const [scores, setScores] = useState([]);
     const [totalPoints, setTotalPoints] = useState(0);
@@ -207,6 +206,7 @@ export default Gameboard = ({navigation, route}) => {
         }
         setTotalPoints(sum);*/
 
+        // checkBonusPoints();
         setNbrOfThrowsLeft(nbrOfThrowsLeft-1);
         setDiceSpots(spots);
         setStatus('Select and throw dices again');
@@ -233,20 +233,9 @@ export default Gameboard = ({navigation, route}) => {
         setTotalPoints(0);
         setSelectedDicePoints(new Array(MAX_SPOT).fill(false));
         setNbrOfThrowsLeft(NBR_OF_THROWS);
+        setBonusPointsStatus('');
         diceSpots.fill(0);
-        setPointsLeftToBonus(BONUS_POINTS_LIMIT);
         addBonus = false;
-    }
-
-    // Adding bonus points
-
-    const checkBonusPoints = () => {
-
-        if (pointsLeftToBonus <= 0 && addBonus === false) {
-            addBonus = true;
-            setTotalPoints(totalPoints + pointsLeftToBonus);
-            setBonusPointsStatus('You got bonus points (+50p)!');
-        }
     }
     
 
@@ -283,10 +272,60 @@ export default Gameboard = ({navigation, route}) => {
 
         for (let i of dicePointsTotal) {
             sum = sum + i;
+
+            if (sum >= 63 && addBonus == true) {
+                sum = sum + 50;
+                setBonusPointsStatus('You got bonus points (+50p)!');
+                addBonus = false;
+            }
         }
 
         setTotalPoints(sum);
+        //checkBonusPoints();
     })
+
+    // Adding bonus points
+
+    /* useEffect(() => {
+
+        /*addBonus = false;
+
+        if (totalPoints >= 63) {
+            addBonus = true;
+            let bonusPointsAdded = totalPoints + 50;
+            setTotalPoints(bonusPointsAdded);
+            setBonusPointsStatus('You got bonus points (+50p)!');
+        } else if (totalPoints >= 113) {
+            addBonus = false;
+        }
+
+        console.log(totalPoints);
+        return;
+
+        if (totalPoints >= 63) {
+            let bonus = 50;
+            let total = totalPoints;
+            setTotalPoints(total + bonus);
+            console.log(totalPoints);
+        }
+
+    }) */
+
+    /*let bonus = 0;
+
+   const checkBonusPoints = () => {
+
+        if (BONUS_POINTS_LIMIT <= totalPoints && addBonus == true) {
+            bonus = totalPoints + 50;
+            setBonusPointsStatus('You got bonus points (+50p)!');
+            addBonus = false;
+            console.log(bonus);
+        }else if (addBonus === true) {
+            addBonus = false;
+        }
+
+        //console.log(bonus);
+    } */
 
     /* Starting the game again after points are selected for every number and saving points. */
 

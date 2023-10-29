@@ -29,7 +29,7 @@ export default Home = ({navigation}) => {
                             <TextInput onChangeText={setPlayerName} autoFocus={true} />
                             <Pressable
                                 onPress={() => handlePlayerName(playerName)}
-                                ><Text style={styles.button}>Continue</Text>
+                                ><Text style={styles.button}>OK</Text>
                             </Pressable>
                         </>
                         :
