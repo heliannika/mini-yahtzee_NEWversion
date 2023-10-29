@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 let board = [];
 // let diceValues = [];
-let addBonus = true
+let addBonus = true;
 
 export default Gameboard = ({navigation, route}) => {
 
@@ -235,7 +235,7 @@ export default Gameboard = ({navigation, route}) => {
         setNbrOfThrowsLeft(NBR_OF_THROWS);
         setBonusPointsStatus('');
         diceSpots.fill(0);
-        addBonus = false;
+        addBonus = true;
     }
     
 
@@ -264,7 +264,7 @@ export default Gameboard = ({navigation, route}) => {
         return unsubscribe;
     }, [navigation]);
 
-    // Addition for total points (this doesn't work correctly yet)
+    // Addition for total points & checking if the player got bonus points
 
     useEffect(() => {
 
@@ -327,7 +327,7 @@ export default Gameboard = ({navigation, route}) => {
         //console.log(bonus);
     } */
 
-    /* Starting the game again after points are selected for every number and saving points. */
+    /* Starting the game again after points are selected for every number and saving player points. */
 
    useEffect(() => {
         if (selectedDicePoints.every((val) => val === true)) {
